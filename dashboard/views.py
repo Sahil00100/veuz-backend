@@ -7,6 +7,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny,IsAuthenticated
 from django.core.paginator import Paginator
+from django.db.models import Q
 # Create your views here.
 
 @api_view(["GET"])
@@ -63,7 +64,7 @@ def employee_view(request):
         total_count = EmployeeInstances.count()
 
         if search is not None:
-            EmployeeInstances  = EmployeeInstances.filter(name__istartswith=search)
+            EmployeeInstances  = EmployeeInstances.filter(Q(name__istartswith=search) | Q (email__startswith=search)  | Q (phone_number__startswith=search) )
 
 
 

@@ -16,15 +16,10 @@ class Employee(models.Model):
 
 
 class CustomField(models.Model):
-    # employee = models.ForeignKey(Employee, related_name='custom_fields', on_delete=models.CASCADE)
     label = models.CharField(max_length=100)
     field_name = models.CharField(max_length=100)
     data_type = models.CharField(max_length=50)  
 
-    # value_text = models.TextField(blank=True, null=True)
-    # value_integer = models.IntegerField(blank=True, null=True)
-    # value_char = models.CharField(max_length=100,blank=True, null=True)
-    # value_bool = models.BooleanField(default=False)
 
 
 
