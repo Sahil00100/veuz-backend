@@ -34,6 +34,12 @@ def employee_settings(request):
 
     elif request.method == "POST":
 
+        required_fields = ["field_name","data_type"]
+        fields_missing = [item for item in required_fields if item not in data]
+        if fields_missing:
+            return Response({"message":f"Required fields missing : {fields_missing}"},status=status.HTTP_400_BAD_REQUEST)
+
+
         # label = data["label"]
         field_name = data["field_name"]
         data_type = data["data_type"]
@@ -53,7 +59,7 @@ def employee_settings(request):
     return Response(response_data) 
 
 
-
+import re
 @api_view(["GET","POST"])
 @permission_classes([IsAuthenticated])
 def employee_view(request):
@@ -65,8 +71,6 @@ def employee_view(request):
 
         if search is not None:
             EmployeeInstances  = EmployeeInstances.filter(Q(name__istartswith=search) | Q (email__startswith=search)  | Q (phone_number__startswith=search) )
-
-
 
         #pagination
         paginator = Paginator(EmployeeInstances, 10)
@@ -91,7 +95,6 @@ def employee_view(request):
                 else:
                     item_data[custom_item.label] = str(custom_value_item["value"]
 )
-
             data.append(item_data)
 
         response_data = {"data":data,"total_count":total_count}
@@ -99,10 +102,29 @@ def employee_view(request):
 
     elif request.method == "POST":
         data = request.data
+        
+
+        required_fields = ["name","phone_number","email"]
+        fields_missing = [item for item in required_fields if item not in data]
+        if fields_missing:
+            return Response({"message":f"Required fields missing : {fields_missing}"},status=status.HTTP_400_BAD_REQUEST)
+
 
         name = data["name"]
         phone_number = data["phone_number"]
         email = data["email"]
+
+
+        # Validate email 
+        if not re.match(r"[^@]+@[^@]+\.[^@]+", email):
+            return Response({"message": "Invalid email "},status=status.HTTP_400_BAD_REQUEST)
+
+        # Validate phone number 
+        if not re.match(r"^\d{10}$", phone_number):  
+            return Response({"message": "Phone number must be 10 digits."},status=status.HTTP_400_BAD_REQUEST)
+
+
+
         custom_values = data["custom_values"]
 
         Employee.objects.create(
